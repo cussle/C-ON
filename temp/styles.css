@@ -1,0 +1,79 @@
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+    margin: 0;
+    font-family: 'Arial', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+}
+
+#slogan-wrapper {
+    position: relative;
+    width: 80%;
+    max-width: 800px;
+    height: 4rem; /* 높이를 더 높게 설정 */
+    font-weight: 600;
+    font-size: 2rem;
+    margin: 3rem auto;
+    color: gray;
+    overflow: visible; /* overflow를 visible로 설정하여 잘림 방지 */
+    white-space: nowrap;
+}
+
+.slogan-text {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    opacity: 1;
+}
+
+.slogan-word {
+    display: inline-block;
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+.slogan-letter {
+    display: inline-block;
+    position: relative;
+    transform: translateZ(25px);
+    transform-origin: 50% 50% 25px;
+    opacity: 1;
+    transition: transform 0.5s, opacity 0.5s;
+}
+
+.slogan-letter.slogan-letter-animation-out {
+    transform: rotateX(90deg);
+    opacity: 0;
+}
+
+.slogan-letter.slogan-letter-animation-behind {
+    transform: rotateX(-90deg);
+    opacity: 1;
+}
+
+.slogan-letter.slogan-letter-animation-in {
+    transform: rotateX(0deg);
+    opacity: 1;
+}
+
+#image-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+}
+
+#rotating-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 1s;
+}

@@ -1,0 +1,176 @@
+/* Nav */
+#nav {
+    box-shadow: 0 4px 2px -2px gray; /* 하단에만 그림자가 생기도록 설정 */
+    z-index: 10; /* 다른 요소 위에 표시되도록 우선순위를 높임 */
+    background-color: white; /* nav 배경색이 명확히 보이도록 설정 */
+    position: sticky; /* 스크롤 시 상단에 고정 */
+    top: 0; /* 상단에 위치 */
+}
+
+#nav img {
+    margin-left: 3rem;
+    width: 150px;
+}
+
+.nav-btns {
+    padding-right: 3rem;
+}
+
+.nav-btns button {
+    width: 120px;
+    height: 50px;
+}
+
+/* Slogan and Rotating Image Styles for Menu Suggestion */
+.menu-suggestion {
+    margin: 100px 0 50px 0;
+    background-color: var(--Pantone877C);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden; /* Ensure children are contained */
+    color: var(--CnuDarkBlue);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.menu-suggestion h2 {
+    font-size: 2rem;
+    margin: 1.5rem 0 0 1rem;
+    font-weight: 700;
+    z-index: 2; /* Ensure text is above the image */
+}
+
+#slogan-wrapper {
+    position: relative;
+    z-index: 2; /* Ensure text is above the image */
+    width: 100%;
+    max-width: 800px;
+    height: 4rem; /* Height for better visibility */
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin: 2rem 0;
+    color: gray;
+    white-space: nowrap;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.slogan-text {
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    opacity: 1;
+}
+
+.slogan-word {
+    display: inline-block;
+    opacity: 1;
+    transition: opacity 0.5s;
+}
+
+.slogan-letter {
+    display: inline-block;
+    position: relative;
+    transform: translateZ(25px);
+    transform-origin: 50% 50% 25px;
+    opacity: 1;
+    transition: transform 0.5s, opacity 0.5s;
+}
+
+.slogan-letter.slogan-letter-animation-out {
+    transform: rotateX(90deg);
+    opacity: 0;
+}
+
+.slogan-letter.slogan-letter-animation-behind {
+    transform: rotateX(-90deg);
+    opacity: 1;
+}
+
+.slogan-letter.slogan-letter-animation-in {
+    transform: rotateX(0deg);
+    opacity: 1;
+}
+
+#image-container {
+    right: 10%;
+    top: 50%;
+    transform: translateY(-50%);
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#image-container img {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    opacity: 0;
+    transition: opacity 1s;
+    margin-top: 20px;  /* Top margin for vertical spacing */
+    margin-bottom: 20px; /* Bottom margin for vertical spacing */
+}
+
+/* Category Buttons */
+.category-button {
+    width: 200px;
+    height: 300px;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.7rem;
+    color: white;
+    background-color: var(--Pantone877C);
+    cursor: pointer;
+    z-index: 1;
+    transition: all 0.5s ease;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* 텍스트 그림자 추가 */
+}
+
+.category-button::before {
+    content: '';
+    position: absolute;
+    top: 100%; /* 초기 위치를 버튼 아래로 설정 */
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: top 0.5s cubic-bezier(0, 0, 0, 1), opacity 0.5s ease;
+    z-index: -1;
+    opacity: 0; /* 기본 상태에서는 보이지 않도록 설정 */
+}
+
+.category-button:hover::before {
+    top: 0; /* 마우스를 올렸을 때, 배경이 버튼 안으로 이동 */
+    opacity: 1; /* 마우스를 올렸을 때 배경이 보이도록 설정 */
+}
+
+.category-button:hover {
+    font-weight: 900;
+    z-index: 10;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8); /* hover 시 텍스트 그림자 증가 */
+}
+
+
+
+
+
