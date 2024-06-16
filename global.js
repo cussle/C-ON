@@ -6,4 +6,10 @@ $(document).ready(function() {
     $(window).on('load', function() {
         endLoad();
     });
+
+    // Handle login button click
+    $('.to-login').on('click', function() {
+        // Redirect to the login page
+        window.location.href = 'login/index.html';
+    });
 });

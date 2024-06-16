@@ -1,0 +1,46 @@
+/* Center the login form and make it look clean */
+body {
+    background-color: #f2f2f2;
+    font-family: 'Nanum Gothic', 'Noto Sans KR', sans-serif;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 400px;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.login-wrapper img {
+    max-width: 100%;
+    height: auto;
+}
+
+.login-wrapper h2 {
+    font-weight: 700;
+    color: #333;
+}
+
+.login-wrapper .form-label {
+    font-weight: 600;
+}
+
+.login-wrapper .btn-primary {
+    background-color: #1a73e8;
+    border-color: #1a73e8;
+}
+
+.login-wrapper .btn-primary:hover {
+    background-color: #135ab7;
+    border-color: #135ab7;
+}
+
+.login-wrapper a {
+    color: #1a73e8;
+}
+
+.login-wrapper a:hover {
+    color: #135ab7;
+}

@@ -1,0 +1,121 @@
+/* Menu Search Section */
+.search-controls {
+    margin: 2rem auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: var(--CnuDarkBlue);
+    text-align: center;
+
+    /* Flexbox settings */
+    display: flex;
+    flex-direction: row; /* Horizontal layout */
+    justify-content: center; /* Center items horizontally */
+    align-items: center; /* Center items vertically */
+    gap: 3rem; /* Space between items */
+}
+
+/* Adjustments for individual search items */
+.search-item {
+    flex: 1; /* Allow items to grow and take equal space */
+    max-width: 400px; /* Increase maximum width */
+    text-align: left; /* Align text to the left for better readability */
+}
+
+/* Range container adjustments */
+.range_container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+/* Sliders control adjustments */
+.sliders_control {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Form control container */
+.form_control {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+/* Input adjustments */
+.form_control_container__time__input {
+    width: 100px; /* Set a fixed width for number inputs */
+}
+
+/* Search button adjustment */
+.search-button {
+    max-width: 100px; /* Reduce the maximum width for the button */
+    flex: none; /* Ensure the button does not grow like the other items */
+}
+
+
+/* Search Results Section */
+.search-results .menu-item {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.5rem; /* Space between rows */
+}
+
+.card {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card img {
+    object-fit: cover;
+    border-top-left-radius: 0.75rem;
+    border-top-right-radius: 0.75rem;
+}
+
+.card .card-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1rem;
+    text-align: center;
+}
+
+.card .card-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+.card .card-text {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.card .card-price {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--CnuDarkBlue);
+}
+
+
+/* Modal */
+.modal-content {
+    border-radius: 10px;
+}
+
+.modal-body img {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.modal-body h5, .modal-body p {
+    margin-bottom: 1rem;
+}

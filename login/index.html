@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- meta -->
+    <meta charset="UTF-8">
+    <meta name="author" content="202002521 이경빈">
+    <meta name="keywords" content="C-ON, CNU, 충남대학교, 메뉴, 주문, 결제, 음식">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C-ON | 로그인</title>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../src/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../src/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../src/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../src/favicon/site.webmanifest">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
+
+    <!-- Custom stylesheet -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../global.css">
+    <link rel="stylesheet" href="stylesheet.css">
+
+    <!-- script -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../global.js"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+    <!-- loading -->
+    <div id="loadingPage" class="loading-page">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
+        <div class="login-wrapper p-4 bg-white shadow-lg rounded">
+            <div class="text-center mb-4">
+                <img src="../src/logo/logo.png" alt="C-ON Logo" class="img-fluid" style="max-width: 150px;">
+            </div>
+            <h2 class="text-center mb-4">로그인</h2>
+            <form>
+                <div class="mb-3">
+                    <label for="username" class="form-label">사용자 이름</label>
+                    <input type="text" class="form-control" id="username" placeholder="사용자 이름을 입력하세요" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="password" placeholder="비밀번호를 입력하세요" required>
+                </div>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">로그인</button>
+                </div>
+            </form>
+        </div>
+</body>
+</html>
