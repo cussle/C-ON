@@ -46,6 +46,23 @@ $(document).ready(function() {
             $container.append($itemDiv);
         });
 
+        // Check if all images are loaded
+        let imagesLoaded = 0;
+        const totalImages = $('img').length;
+
+        $('img').on('load', function() {
+            imagesLoaded++;
+            if (imagesLoaded === totalImages) {
+                // All images have loaded, hide the loading page
+                endLoad();
+            }
+        }).each(function() {
+            // For cached images, trigger the load event manually
+            if (this.complete) {
+                $(this).trigger('load');
+            }
+        });
+
         // Bind click event to newly created menu items to show details in the modal
         $('.menu-item').on('click', function() {
             const itemId = parseInt($(this).data('id'), 10);
@@ -119,10 +136,12 @@ $(document).ready(function() {
     
                         // Generate and display the menu items
                         generateMenuItems(items);
-                        endLoad();
 
-                        
-                        console.log(response.data);
+                        // Check if there are no images to load
+                        if ($('img').length === 0) {
+                            endLoad();
+                            showToast("검색 조건에 부합하는 음식이 없습니다.");
+                        }
                     })
                 } else {
                     showToast('데이터를 불러오는 데 실패했습니다: ' + response.message, 3000, true);
@@ -141,3 +160,4 @@ $(document).ready(function() {
     $("#category-select").val(urlParams.get('category'));
     $('#search-button').click();
 });
+

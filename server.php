@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         $keyword = isset($_REQUEST['keyword']) ? trim($_REQUEST['keyword']) : '';
 
         // 기본 쿼리
-        $query = 'SELECT f.foodName, f.price 
+        $query = 'SELECT DISTINCT f.foodName, f.price 
                   FROM Food f 
                   LEFT JOIN Contain c ON f.foodName = c.foodName';
         $conditions = [];

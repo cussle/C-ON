@@ -79,8 +79,8 @@ function checkLoginStatus() {
             if (response.logged_in) {
                 $('#nav .nav-btns').html(`
                     <div class="welcome-message">안녕하세요, ${response.name}님!</div>
-                    <button class="scale-button" onclick="location.href='${baseURL}cart.html'">장바구니</button>
-                    <button class="scale-button" onclick="location.href='${baseURL}orders.html'">주문내역</button>
+                    <button class="scale-button" onclick="location.href='${baseURL}cart'">장바구니</button>
+                    <button class="scale-button" onclick="location.href='${baseURL}orders'">주문내역</button>
                     <button class="scale-button" onclick="logout()">Logout</button>
                 `);
             }
