@@ -1,16 +1,18 @@
 $(document).ready(function() {
-    // Sample data for menu items
-    const menuItems = [
-        { id: 1, title: 'Sample Menu Item 1', image: 'https://picsum.photos/200/150?random=1', description: 'Detailed description of the menu item 1.', price: '₩10,000' },
-        { id: 2, title: 'Sample Menu Item 2', image: 'https://picsum.photos/200/150?random=2', description: 'Detailed description of the menu item 2.', price: '₩15,000' },
-        { id: 3, title: 'Sample Menu Item 3', image: 'https://picsum.photos/200/150?random=3', description: 'Detailed description of the menu item 3.', price: '₩20,000' },
-        { id: 4, title: 'Sample Menu Item 4', image: 'https://picsum.photos/200/150?random=4', description: 'Detailed description of the menu item 4.', price: '₩12,000' },
-        { id: 5, title: 'Sample Menu Item 5', image: 'https://picsum.photos/200/150?random=5', description: 'Detailed description of the menu item 5.', price: '₩9,000' },
-        { id: 6, title: 'Sample Menu Item 6', image: 'https://picsum.photos/200/150?random=6', description: 'Detailed description of the menu item 6.', price: '₩11,000' },
-        { id: 7, title: 'Sample Menu Item 7', image: 'https://picsum.photos/200/150?random=7', description: 'Detailed description of the menu item 7.', price: '₩14,000' },
-        { id: 8, title: 'Sample Menu Item 8', image: 'https://picsum.photos/200/150?random=8', description: 'Detailed description of the menu item 8.', price: '₩13,000' },
-        { id: 9, title: 'Sample Menu Item 9', image: 'https://picsum.photos/200/150?random=9', description: 'Detailed description of the menu item 9.', price: '₩8,000' },
-    ];
+    // 로그인 상태 확인
+    $.ajax({
+        url: authURL,
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            if (response.logged_in) {
+                $('#toCart').text('장바구니 담기');
+            }
+        },
+        error: function() {
+            console.error('로그인 상태를 확인하는 중 오류가 발생했습니다.');
+        }
+    });
 
     // Function to create and append menu items to the search-results container
     function generateMenuItems(items) {
@@ -47,7 +49,7 @@ $(document).ready(function() {
         // Bind click event to newly created menu items to show details in the modal
         $('.menu-item').on('click', function() {
             const itemId = parseInt($(this).data('id'), 10);
-            const item = menuItems.find(menuItem => menuItem.id === itemId);
+            const item = items.find(menuItem => menuItem.id === itemId);
 
             if (item) {
                 showMenuItemDetails(item);
@@ -63,13 +65,79 @@ $(document).ready(function() {
         $modalTitle.text(item.title);
         $modalBody.html(`
             <img src="${item.image}" class="img-fluid" alt="Menu Item Image">
-            <h5>Description</h5>
             <p>${item.description}</p>
-            <h5>Price</h5>
+            <h5>가격: </h5>
             <p>${item.price}</p>
         `);
     }
 
-    // Generate and display the menu items when the document is ready
-    generateMenuItems(menuItems);
+    $('#search-button').on('click', function() {
+        startLoad();
+
+        // Get search parameters
+        const categoryEnglish = $('#category-select').val();
+        const minPrice = $('#fromInput').val();
+        const maxPrice = $('#toInput').val();
+        const keyword = $('#search-keyword').val();
+
+        // Define the category mapping from English to Korean
+        const categoryMap = {
+            'korean': '한식',
+            'western': '양식',
+            'chinese': '중식',
+            'japanese': '일식',
+            'dessert': '디저트',
+            'all': 'all' // For the '전체보기' option
+        };
+
+        // Convert the selected category to Korean
+        const category = categoryMap[categoryEnglish] || 'all';
+
+        $.ajax({
+            url: '../server.php',
+            type: 'GET',
+            data: { 
+                action: 'getFilteredFood', 
+                category: category,
+                minPrice: minPrice,
+                maxPrice: maxPrice,
+                keyword: keyword
+            },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    // Load the food_info.json file
+                    $.getJSON('../src/food_info.json').done(function(foodInfo) {
+                        // Map the response data to match the menuItems structure
+                        const items = response.data.map((food, index) => ({
+                            id: index + 1,
+                            title: food.FOODNAME,
+                            image: 'https://via.placeholder.com/500?text=' + foodInfo[food.FOODNAME]["eng"], // Placeholder image
+                            description: food.FOODNAME + ' 설명입니다.', // Placeholder description
+                            price: '₩' + food.PRICE
+                        }));
+    
+                        // Generate and display the menu items
+                        generateMenuItems(items);
+                        endLoad();
+
+                        
+                        console.log(response.data);
+                    })
+                } else {
+                    showToast('데이터를 불러오는 데 실패했습니다: ' + response.message, 3000, true);
+                    endLoad();
+                }
+            },
+            error: function() {
+                showToast('서버와의 통신 중 오류가 발생했습니다.', 3000, true);
+                endLoad();
+            }
+        });
+    });
+
+    // URL의 'login' 파라미터를 확인하여 메뉴 제시
+    const urlParams = new URLSearchParams(window.location.search);
+    $("#category-select").val(urlParams.get('category'));
+    $('#search-button').click();
 });

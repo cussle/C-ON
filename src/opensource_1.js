@@ -38,7 +38,7 @@ $(document).ready(function() {
     // Sliding event of the From slider
     function controlFromSlider(fromSlider, toSlider, fromInput) {
         const [from, to] = getParsed(fromSlider, toSlider);
-        console.log([from, to]);
+        // console.log([from, to]);
         fillSlider(fromSlider, toSlider, "var(--Pantone877C)", "var(--CnuBlue)", toSlider);
         fromInput.value = from;
         if (from > to) {
