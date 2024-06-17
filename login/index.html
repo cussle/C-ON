@@ -31,6 +31,15 @@
     <script src="script.js"></script>
 </head>
 <body>
+    <?php
+    session_start();
+    if (isset($_SESSION['cno'])) {
+        // 세션이 존재하면 index.html로 리다이렉트
+        header("Location: ../index.html");
+        exit;
+    }
+    ?>
+
     <!-- loading -->
     <div id="loadingPage" class="loading-page">
         <div class="loading-spinner"></div>
@@ -40,22 +49,28 @@
     <div class="container-fluid vh-100 d-flex align-items-center justify-content-center">
         <div class="login-wrapper p-4 bg-white shadow-lg rounded">
             <div class="text-center mb-4">
-                <img src="../src/logo/logo.png" alt="C-ON Logo" class="img-fluid" style="max-width: 150px;">
+                <a href="../index.html">
+                    <img src="../src/logo/logo.png" alt="C-ON Logo" class="img-fluid" style="max-width: 150px;">
+                </a>
             </div>
             <h2 class="text-center mb-4">로그인</h2>
-            <form>
+            <form id="login-form">
                 <div class="mb-3">
-                    <label for="username" class="form-label">사용자 이름</label>
-                    <input type="text" class="form-control" id="username" placeholder="사용자 이름을 입력하세요" required>
+                    <label for="cno" class="form-label">아이디</label>
+                    <input type="text" class="form-control" id="cno" name="cno" placeholder="ID" required>
                 </div>
                 <div class="mb-3">
-                    <label for="password" class="form-label">비밀번호</label>
-                    <input type="password" class="form-control" id="password" placeholder="비밀번호를 입력하세요" required>
+                    <label for="passwd" class="form-label">비밀번호</label>
+                    <input type="password" class="form-control" id="passwd" name="passwd" placeholder="password" required>
                 </div>
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary">로그인</button>
                 </div>
             </form>
         </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container"></div>
 </body>
 </html>

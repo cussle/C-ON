@@ -236,7 +236,7 @@ p.unDeveloped {
 }
 
 .custom-toast {
-    background-color: var(--green);
+    background-color: var(--CnuLightBlue);
     color: white;
     padding: 1rem 2rem;
     margin-top: 10px;
@@ -260,7 +260,7 @@ p.unDeveloped {
 }
 
 .warning-toast {
-    background-color: var(--wisteria);
+    background-color: var(--CnuOrange);
 }
 
 
@@ -287,9 +287,17 @@ p.unDeveloped {
     padding-right: 3rem;
     display: flex;
     justify-content: right;
+    gap: 1rem;
 }
 
 .nav-btns button {
     width: 120px;
     height: 35px;
+}
+
+.welcome-message {
+    display: flex;
+    align-items: center;
+    margin-right: 2rem;
+    color: var(--Pantone877C);
 }
