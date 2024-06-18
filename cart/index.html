@@ -48,15 +48,12 @@
                 </div>
             </div>
             <div class="col-6 text-end nav-btns">
-                <button class="scale-button to-login" data-target="login/index.html">Login</button>
+                <button class="scale-button to-login" data-target="../login/index.html">Login</button>
             </div>
         </div>
 
         <!-- Cart Section -->
         <div class="container mt-4">
-            <!-- Cart Title -->
-            <h2 class="text-center mb-4">장바구니</h2>
-
             <!-- Cart Item List -->
             <div class="row" id="cart-items">
                 <!-- Example of a Cart Item -->
@@ -95,13 +92,16 @@
 
             <!-- Cart Summary -->
             <div class="row mt-4">
-                <div class="col-12 text-end">
-                    <p>총 음식 개수: <span id="total-items">3</span></p>
-                    <p>총 결제 금액: ₩<span id="total-price">30,000</span></p>
-                    <button class="btn btn-success">결제하기</button>
+                <div class="col-12 d-flex justify-content-end align-items-center">
+                    <p class="mb-0 me-3"><strong>총 음식 개수:</strong> <span id="total-items">3</span></p>
+                    <p class="mb-0 me-3"><strong>총 결제 금액:</strong> ₩<span id="total-price">30,000</span></p>
+                    <button id="checkout-button" class="btn btn-success">결제하기</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container"></div>
 </body>
 </html>

@@ -91,7 +91,7 @@ function checkLoginStatus() {
     });
 }
 
-// 로그아웃 함수
+/* 로그아웃 함수 */
 function logout() {
     $.ajax({
         url: authURL, // 통합된 PHP 파일로 요청
