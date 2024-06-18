@@ -68,8 +68,318 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
         // JSON으로 변환하여 출력
         echo json_encode(array('success' => true, 'data' => $foods));
+    } else if ($action == 'getCart') {
+        // 사용자 ID 가져오기 (예: 세션에 저장된 사용자 ID 사용)
+        $userId = $_SESSION['cno'] ?? null;
+
+        if ($userId) {
+            $query = '
+                SELECT 
+                    C.id AS OrderID,
+                    C.orderDateTime AS OrderDateTime,
+                    C.cno AS CustomerNo,
+                    OD.itemNo AS ItemNo,
+                    OD.foodName AS FoodName,
+                    CT.categoryName AS CategoryName,
+                    F.price AS UnitPrice,
+                    OD.quantity AS Quantity,
+                    OD.totalPrice AS TotalPrice
+                FROM 
+                    Cart C
+                JOIN 
+                    OrderDetail OD ON C.id = OD.id
+                JOIN 
+                    Contain CT ON OD.foodName = CT.foodName
+                JOIN
+                    Food F ON OD.foodName = F.foodName
+                WHERE 
+                    C.cno = :userId
+                    AND C.id = (
+                        SELECT MAX(id) 
+                        FROM Cart 
+                        WHERE cno = :userId
+                    )
+                ORDER BY 
+                    C.orderDateTime, C.id, OD.itemNo, CT.categoryName
+            ';
+
+            $stmt = $conn->prepare($query);
+            $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
+            $stmt->execute();
+            $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode(array('success' => true, 'data' => $cartItems, 'debug' => $stmt));
+        } else {
+            echo json_encode(array('success' => false, 'message' => '사용자가 로그인되어 있지 않습니다.'));
+        }
+    } else if ($action == 'getRecentOrders') {
+        try {
+            // 일반 대중의 최근 주문 내역
+            $query = '
+                SELECT 
+                    F.foodName AS FoodName,
+                    EXTRACT(DAY FROM (SYSDATE - C.orderDateTime)) * 24 * 60 + 
+                    EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) * 60 + 
+                    EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS TotalMinutesAgo,
+                    EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) AS HoursAgo,
+                    EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS MinutesAgo
+                FROM 
+                    OrderDetail O
+                JOIN 
+                    Food F ON O.foodName = F.foodName
+                JOIN 
+                    Cart C ON O.id = C.id
+                ORDER BY 
+                    C.orderDateTime DESC
+                FETCH FIRST 10 ROWS ONLY
+            ';
+    
+            $stmt = $conn->prepare($query);
+            $stmt->execute();
+            $recentOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+            // 로그인한 사용자의 주문 내역
+            $userId = $_SESSION['cno'] ?? null;
+            $userOrders = [];
+    
+            if ($userId) {
+                $userQuery = '
+                    SELECT 
+                        F.foodName AS FoodName,
+                        EXTRACT(DAY FROM (SYSDATE - C.orderDateTime)) * 24 * 60 + 
+                        EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) * 60 + 
+                        EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS TotalMinutesAgo,
+                        EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) AS HoursAgo,
+                        EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS MinutesAgo
+                    FROM 
+                        OrderDetail O
+                    JOIN 
+                        Food F ON O.foodName = F.foodName
+                    JOIN 
+                        Cart C ON O.id = C.id
+                    WHERE 
+                        C.cno = :userId
+                    ORDER BY 
+                        C.orderDateTime DESC
+                    FETCH FIRST 10 ROWS ONLY
+                ';
+    
+                $userStmt = $conn->prepare($userQuery);
+                $userStmt->bindParam(':userId', $userId, PDO::PARAM_STR);
+                $userStmt->execute();
+                $userOrders = $userStmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+    
+            // JSON으로 응답
+            echo json_encode(array(
+                'success' => true,
+                'data' => $recentOrders,
+                'userOrders' => $userOrders
+            ));
+        } catch (Exception $e) {
+            echo json_encode(array('success' => false, 'message' => '주문 내역을 불러오는 중 오류 발생: ' . $e->getMessage()));
+        }
     } else {
-        // action이 'getFilteredFood'가 아닐 경우
+        echo json_encode(array('success' => false, 'message' => '유효하지 않은 action입니다.'));
+    }
+} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
+
+    if ($action == 'updateCartItem') {
+        $itemId = isset($_REQUEST['itemId']) ? $_REQUEST['itemId'] : null;
+        $orderId = isset($_REQUEST['orderId']) ? $_REQUEST['orderId'] : null;
+        $quantity = isset($_REQUEST['quantity']) ? $_REQUEST['quantity'] : null;
+    
+        if ($itemId && $quantity) {
+            try {
+                $query = '
+                    UPDATE OrderDetail
+                    SET quantity = :quantity
+                    WHERE itemNo = :itemId AND id = :orderId
+                ';
+    
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
+                $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+                $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                $stmt->execute();
+    
+                echo json_encode(array('success' => true));
+            } catch (Exception $e) {
+                echo json_encode(array('success' => false, 'message' => '업데이트 중 오류 발생: ' . $e->getMessage()));
+            }
+        } else {
+            echo json_encode(array('success' => false, 'message' => '아이템 ID와 수량을 제공해야 합니다.'));
+        }
+    } elseif ($action == 'deleteCartItem') {
+        $itemId = isset($_REQUEST['itemId']) ? $_REQUEST['itemId'] : null;
+        $orderId = isset($_REQUEST['orderId']) ? $_REQUEST['orderId'] : null;
+    
+        if ($itemId && $orderId) {
+            try {
+                $query = 'DELETE FROM OrderDetail WHERE itemNo = :itemId AND id = :orderId';
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+                $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                $stmt->execute();
+    
+                echo json_encode(array('success' => true));
+            } catch (Exception $e) {
+                echo json_encode(array('success' => false, 'message' => '삭제 중 오류 발생: ' . $e->getMessage()));
+            }
+        } else {
+            echo json_encode(array('success' => false, 'message' => '아이템 ID와 주문 ID를 제공해야 합니다.'));
+        }
+    } else if ($action == 'addToCart') {
+        $userId = $_SESSION['cno'] ?? null;
+        $foodName = $_REQUEST['foodName'] ?? null;
+    
+        if ($userId && $foodName) {
+            try {
+                // 음식 정보를 SQL로 가져오기
+                $query = 'SELECT f.foodName, f.price, c.categoryName
+                          FROM Food f
+                          JOIN Contain c ON f.foodName = c.foodName
+                          WHERE f.foodName = :foodName';
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':foodName', $foodName, PDO::PARAM_STR);
+                $stmt->execute();
+                $foodInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+                if (!$foodInfo) {
+                    throw new Exception('음식을 찾을 수 없습니다.');
+                }
+    
+                // 사용자의 가장 최근 장바구니 찾기
+                $query = 'SELECT id FROM Cart WHERE cno = :userId ORDER BY TO_NUMBER(SUBSTR(id, 2)) DESC FETCH FIRST 1 ROWS ONLY';
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
+                $stmt->execute();
+                $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$cart) {
+                    throw new Exception('사용자의 장바구니를 찾을 수 없습니다.');
+                }
+
+                $orderId = $cart['ID'];
+                
+                // 해당 장바구니에 음식이 이미 있는지 확인
+                $query = 'SELECT itemNo, quantity FROM OrderDetail WHERE id = :orderId AND foodName = :foodName';
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                $stmt->bindParam(':foodName', $foodName, PDO::PARAM_STR);
+                $stmt->execute();
+                $existingItem = $stmt->fetch(PDO::FETCH_ASSOC);
+                // echo json_encode(array('success' => true, 'message' => $existingItem));
+    
+                if ($existingItem) {
+                    // 이미 존재하는 경우 수량 업데이트
+                    $newQuantity = $existingItem['QUANTITY'] + 1;
+                    $totalPrice = $newQuantity * $foodInfo['PRICE'];
+    
+                    $query = 'UPDATE OrderDetail 
+                              SET quantity = :quantity, totalPrice = :totalPrice
+                              WHERE id = :orderId AND foodName = :foodName';
+                    $stmt = $conn->prepare($query);
+                    $stmt->bindParam(':quantity', $newQuantity, PDO::PARAM_INT);
+                    $stmt->bindParam(':totalPrice', $totalPrice, PDO::PARAM_INT);
+                    $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                    $stmt->bindParam(':foodName', $foodName, PDO::PARAM_STR);
+                    $stmt->execute();
+                } else {
+                    // 새로운 항목 추가
+                    $query = 'INSERT INTO OrderDetail (itemNo, id, quantity, totalPrice, foodName) 
+                              VALUES ((SELECT COALESCE(MAX(itemNo), 0) + 1 FROM OrderDetail WHERE id = :orderId), 
+                              :orderId, 1, :totalPrice, :foodName)';
+                    $stmt = $conn->prepare($query);
+                    $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                    $stmt->bindParam(':totalPrice', $foodInfo['PRICE'], PDO::PARAM_INT);
+                    $stmt->bindParam(':foodName', $foodName, PDO::PARAM_STR);
+                    $stmt->execute();
+                }
+    
+                // Cart 테이블의 orderDateTime을 현재 시간으로 업데이트
+                $query = 'UPDATE Cart SET orderDateTime = SYSTIMESTAMP WHERE id = :orderId';
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                $stmt->execute();
+    
+                echo json_encode(array('success' => true, 'message' => '장바구니에 항목이 추가되었습니다.'));
+            } catch (Exception $e) {
+                echo json_encode(array('success' => false, 'message' => '장바구니에 추가 중 오류 발생: ' . $e->getMessage()));
+            }
+        } else {
+            echo json_encode(array('success' => false, 'message' => '로그인되지 않았거나 유효하지 않은 데이터입니다.'));
+        }
+    } else if ($action == 'checkout') {
+        $userId = $_SESSION['cno'] ?? null;
+
+        if ($userId) {
+            try {
+                // 현재 시간
+                $currentDateTime = date('Y-m-d H:i:s');
+
+                // 사용자의 가장 최근 장바구니 찾기
+                $query = 'SELECT id FROM Cart WHERE cno = :userId ORDER BY orderDateTime DESC FETCH FIRST 1 ROWS ONLY';
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
+                $stmt->execute();
+                $cart = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if ($cart) {
+                    $orderId = $cart['ID'];
+
+                    // 장바구니에 항목이 있는지 확인
+                    $query = 'SELECT COUNT(*) AS itemCount FROM OrderDetail WHERE id = :orderId';
+                    $stmt = $conn->prepare($query);
+                    $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                    $stmt->execute();
+                    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                    $itemCount = $result['ITEMCOUNT'];
+
+                    if ($itemCount == 0) {
+                        throw new Exception('장바구니에 담긴 물품이 없습니다.');
+                    }
+
+                    // 기존 장바구니의 orderDateTime을 결제된 시간으로 업데이트
+                    $query = 'UPDATE Cart SET orderDateTime = :currentDateTime WHERE id = :orderId';
+                    $stmt = $conn->prepare($query);
+                    $stmt->bindParam(':currentDateTime', $currentDateTime, PDO::PARAM_STR);
+                    $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                    $stmt->execute();
+                } else {
+                    throw new Exception('사용자의 장바구니를 찾을 수 없습니다.');
+                }
+
+                // 현재 가장 큰 id의 숫자를 찾기
+                $query = 'SELECT MAX(TO_NUMBER(SUBSTR(id, 2))) AS maxId FROM Cart';
+                $stmt = $conn->prepare($query);
+                $stmt->execute();
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                $maxId = $result['MAXID'];
+
+                // 새로운 장바구니 ID 생성 (가장 높은 숫자 + 1)
+                $newCartNumber = $maxId + 1;
+                $newCartId = 'O' . str_pad($newCartNumber, 3, '0', STR_PAD_LEFT); // 3자리로 0 채움
+                
+                // echo json_encode(array('success' => true, 'message' => $userId));
+
+                // 새로운 장바구니 생성
+                $query = 'INSERT INTO Cart (id, orderDateTime, cno) VALUES (:id, :orderDateTime, :userId)';
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':id', $newCartId, PDO::PARAM_STR);
+                $stmt->bindParam(':orderDateTime', $currentDateTime, PDO::PARAM_STR);
+                $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
+                $stmt->execute();
+
+                echo json_encode(array('success' => true, 'message' => '결제가 완료되고 새로운 장바구니가 생성되었습니다.'));
+            } catch (Exception $e) {
+                echo json_encode(array('success' => false, 'message' => '결제 처리 중 오류 발생: ' . $e->getMessage()));
+            }
+        } else {
+            echo json_encode(array('success' => false, 'message' => '로그인되지 않았거나 유효하지 않은 데이터입니다.'));
+        }
+    } else {
         echo json_encode(array('success' => false, 'message' => '유효하지 않은 action입니다.'));
     }
 }
