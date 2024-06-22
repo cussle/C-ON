@@ -55,7 +55,7 @@ table {
     --bgColor: rgba(255, 255, 255, 1);
     --CnuDarkBlue: rgba(0, 28, 84, 1);
     --CnuBlue: rgba(3, 78, 162, 1);
-    --CnuSkyBlue: rgba(0, 114, 118, 1);
+    --CnuSkyBlue: rgba(0, 114, 188, 1);
     --CnuLightBlue: rgba(0, 161, 228, 1);
     --CnuYellow: rgba(253, 185, 19, 1);
     --CnuOrange: rgba(247, 148, 29, 1);
@@ -225,6 +225,14 @@ p.unDeveloped {
     transform: scale(1.05);
 }
 
+.admin-button {
+    background-color: var(--CnuLightBlue);
+}
+
+.admin-button:not(:disabled):hover {
+    background-color: var(--CnuSkyBlue);
+}
+
 
 
 /* Toast Notification */
@@ -300,4 +308,35 @@ p.unDeveloped {
     align-items: center;
     margin-right: 2rem;
     color: var(--Pantone877C);
+}
+
+
+/* Search Section */
+.search-controls {
+    margin: 2rem auto;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    color: var(--CnuDarkBlue);
+    text-align: center;
+
+    /* Flexbox settings */
+    display: flex;
+    flex-direction: row; /* Horizontal layout */
+    justify-content: center; /* Center items horizontally */
+    align-items: center; /* Center items vertically */
+    gap: 3rem; /* Space between items */
+}
+
+/* Adjustments for individual search items */
+.search-item {
+    flex: 1; /* Allow items to grow and take equal space */
+    max-width: 400px; /* Increase maximum width */
+    text-align: left; /* Align text to the left for better readability */
+}
+
+/* Search button adjustment */
+.search-button {
+    max-width: 100px; /* Reduce the maximum width for the button */
+    flex: none; /* Ensure the button does not grow like the other items */
 }

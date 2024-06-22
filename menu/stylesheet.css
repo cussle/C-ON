@@ -1,27 +1,3 @@
-/* Menu Search Section */
-.search-controls {
-    margin: 2rem auto;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    color: var(--CnuDarkBlue);
-    text-align: center;
-
-    /* Flexbox settings */
-    display: flex;
-    flex-direction: row; /* Horizontal layout */
-    justify-content: center; /* Center items horizontally */
-    align-items: center; /* Center items vertically */
-    gap: 3rem; /* Space between items */
-}
-
-/* Adjustments for individual search items */
-.search-item {
-    flex: 1; /* Allow items to grow and take equal space */
-    max-width: 400px; /* Increase maximum width */
-    text-align: left; /* Align text to the left for better readability */
-}
-
 /* Range container adjustments */
 .range_container {
     display: flex;
@@ -48,12 +24,6 @@
 /* Input adjustments */
 .form_control_container__time__input {
     width: 100px; /* Set a fixed width for number inputs */
-}
-
-/* Search button adjustment */
-.search-button {
-    max-width: 100px; /* Reduce the maximum width for the button */
-    flex: none; /* Ensure the button does not grow like the other items */
 }
 
 

@@ -77,12 +77,21 @@ function checkLoginStatus() {
         dataType: 'json',
         success: function(response) {
             if (response.logged_in) {
-                $('#nav .nav-btns').html(`
+                let buttonsHtml = `
                     <div class="welcome-message">안녕하세요, ${response.name}님!</div>
                     <button class="scale-button" onclick="location.href='${baseURL}cart'">장바구니</button>
                     <button class="scale-button" onclick="location.href='${baseURL}orders'">주문내역</button>
-                    <button class="scale-button" onclick="logout()">Logout</button>
-                `);
+                `;
+
+                // cno가 C0인 경우 통계 정보 버튼 추가
+                if (response.user === 'C0') {
+                    buttonsHtml += `<button class="scale-button admin-button" onclick="location.href='${baseURL}statistics'">통계 정보</button>`;
+                }
+
+                // Logout 버튼은 항상 마지막에 추가
+                buttonsHtml += `<button class="scale-button" onclick="logout()">Logout</button>`;
+
+                $('#nav .nav-btns').html(buttonsHtml);
             }
         },
         error: function() {
@@ -93,15 +102,17 @@ function checkLoginStatus() {
 
 /* 로그아웃 함수 */
 function logout() {
-    $.ajax({
-        url: authURL, // 통합된 PHP 파일로 요청
-        method: 'POST',
-        data: { action: 'logout' },
-        success: function(response) {
-            location.reload(); // 로그아웃 후 페이지 새로고침
-        },
-        error: function() {
-            console.error('로그아웃 중 오류가 발생했습니다.');
-        }
-    });
+    if (window.confirm("로그아웃 하시겠습니까?")) {
+        $.ajax({
+            url: authURL, // 통합된 PHP 파일로 요청
+            method: 'POST',
+            data: { action: 'logout' },
+            success: function(response) {
+                location.reload(); // 로그아웃 후 페이지 새로고침
+            },
+            error: function() {
+                console.error('로그아웃 중 오류가 발생했습니다.');
+            }
+        });
+    }
 }

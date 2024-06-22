@@ -1,4 +1,19 @@
 $(document).ready(function() {
+    // 로그인된 사용자만 접근 가능
+    $.ajax({
+        url: '../login/auth.php',
+        method: "GET",
+        dataType: "json",
+        success: function(response) {
+            if (! response.logged_in) {
+                window.location.href = "../login";
+            }
+        },
+        error: function() {
+            console.error("로그인 상태를 확인하는 중 오류가 발생했습니다.");
+        }
+    });
+
     // 페이지 로드 시 장바구니 데이터 로드
     function loadCartData() {
         startLoad();
@@ -37,7 +52,14 @@ $(document).ready(function() {
             const $emptyMessage = $('<div>').addClass('col-12 text-center mt-5');
 
             const $messageHeader = $('<p>').addClass('fw-bold fs-4 mb-2').text('장바구니에 담긴 메뉴가 없어요.');
-            const $messageText = $('<p>').addClass('text-muted mb-0').html(' <a href="../menu" class="fw-bold text-decoration-none">여기</a>를 눌러 메뉴를 구경해보세요 😶');
+            const $messageText = $('<p>').addClass('text-muted mt-4 mb-0');
+
+            const $link = $('<a>')
+                .attr('href', '../menu')
+                .addClass('fw-bold text-decoration-none')
+                .text('여기');
+
+            $messageText.append(' ').append($link).append('를 눌러 메뉴를 구경해보세요 😶');
 
             $emptyMessage.append($messageHeader, $messageText);
             $container.append($emptyMessage);
@@ -55,7 +77,7 @@ $(document).ready(function() {
 
                     const $infoCol = $('<div>').addClass('col-12 col-md-2 text-center text-md-start mb-3 mb-md-0');
                     const $foodName = $('<p>').addClass('mb-1').text(item.FOODNAME);
-                    const $categoryName = $('<p>').addClass('text-muted mb-0').text(item.CATEGORYNAME);
+                    const $categoryName = $('<p>').addClass('text-muted mb-0').text(item.CATEGORYNAMES);
                     $infoCol.append($foodName, $categoryName);
 
                     const $priceCol = $('<div>').addClass('col-12 col-md-2 text-center text-md-start mb-3 mb-md-0');
@@ -72,7 +94,7 @@ $(document).ready(function() {
                     $updateCol.append($updateButton);
 
                     const $totalCol = $('<div>').addClass('col-12 col-md-2 text-center text-md-start mb-3 mb-md-0');
-                    const $totalPrice = $('<p>').addClass('mb-1').text('₩' + (Number(item.TOTALPRICE) * item.QUANTITY).toLocaleString());
+                    const $totalPrice = $('<p>').addClass('mb-1').text('₩' + (Number(item.TOTALPRICE)).toLocaleString());
                     const $totalPriceLabel = $('<p>').addClass('text-muted mb-0').text('음식 당 가격');
                     $totalCol.append($totalPrice, $totalPriceLabel);
 

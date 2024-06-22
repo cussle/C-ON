@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Seoul');
+
 session_start();
 
 // 데이터베이스 연결 정보
@@ -71,16 +73,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } else if ($action == 'getCart') {
         // 사용자 ID 가져오기 (예: 세션에 저장된 사용자 ID 사용)
         $userId = $_SESSION['cno'] ?? null;
-
+    
         if ($userId) {
-            $query = '
+            $query = "
                 SELECT 
                     C.id AS OrderID,
                     C.orderDateTime AS OrderDateTime,
                     C.cno AS CustomerNo,
                     OD.itemNo AS ItemNo,
                     OD.foodName AS FoodName,
-                    CT.categoryName AS CategoryName,
+                    LISTAGG(CT.categoryName, ', ') WITHIN GROUP (ORDER BY CT.categoryName) AS CategoryNames,
                     F.price AS UnitPrice,
                     OD.quantity AS Quantity,
                     OD.totalPrice AS TotalPrice
@@ -99,22 +101,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         FROM Cart 
                         WHERE cno = :userId
                     )
+                GROUP BY 
+                    C.id, C.orderDateTime, C.cno, OD.itemNo, OD.foodName, F.price, OD.quantity, OD.totalPrice
                 ORDER BY 
-                    C.orderDateTime, C.id, OD.itemNo, CT.categoryName
-            ';
-
-            $stmt = $conn->prepare($query);
-            $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
-            $stmt->execute();
-            $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            echo json_encode(array('success' => true, 'data' => $cartItems, 'debug' => $stmt));
+                    C.orderDateTime, C.id, OD.itemNo
+            ";
+    
+            try {
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
+                $stmt->execute();
+                $cartItems = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+                echo json_encode(array('success' => true, 'data' => $cartItems));
+            } catch (PDOException $e) {
+                echo json_encode(array('success' => false, 'message' => '데이터베이스 오류: ' . $e->getMessage()));
+            }
         } else {
             echo json_encode(array('success' => false, 'message' => '사용자가 로그인되어 있지 않습니다.'));
         }
     } else if ($action == 'getRecentOrders') {
         try {
             // 일반 대중의 최근 주문 내역
+            // 필요시 추가: FETCH FIRST 10 ROWS ONLY
             $query = '
                 SELECT 
                     F.foodName AS FoodName,
@@ -131,7 +140,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                     Cart C ON O.id = C.id
                 ORDER BY 
                     C.orderDateTime DESC
-                FETCH FIRST 10 ROWS ONLY
             ';
     
             $stmt = $conn->prepare($query);
@@ -161,7 +169,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                         C.cno = :userId
                     ORDER BY 
                         C.orderDateTime DESC
-                    FETCH FIRST 10 ROWS ONLY
                 ';
     
                 $userStmt = $conn->prepare($userQuery);
@@ -179,6 +186,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         } catch (Exception $e) {
             echo json_encode(array('success' => false, 'message' => '주문 내역을 불러오는 중 오류 발생: ' . $e->getMessage()));
         }
+    } else if ($action === 'getUserOrders') {
+        $startDate = $_REQUEST['startDate'] ?? null;
+        $endDate = $_REQUEST['endDate'] ?? null;
+        $userId = $_SESSION['cno'] ?? null;
+    
+        if ($startDate && $endDate && $userId) {
+            try {
+                $query = "
+                    SELECT 
+                        F.foodName AS FoodName,
+                        C.orderDateTime AS OrderDateTime,
+                        OD.quantity AS Quantity,
+                        OD.totalPrice AS TotalPrice,
+                        C.id AS OrderID
+                    FROM 
+                        OrderDetail OD
+                    JOIN 
+                        Food F ON OD.foodName = F.foodName
+                    JOIN 
+                        Cart C ON OD.id = C.id
+                    JOIN 
+                        Customer CU ON C.cno = CU.cno
+                    WHERE 
+                        CU.cno = :userId -- 특정 사용자의 ID를 지정
+                        AND C.orderDateTime BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD') -- 날짜 범위 지정
+                        AND TO_NUMBER(SUBSTR(C.id, 2)) < (
+                            SELECT MAX(TO_NUMBER(SUBSTR(id, 2)))
+                            FROM Cart
+                            WHERE cno = :userId
+                        ) -- 현재 장바구니 내역의 숫자 부분을 최대 값으로 비교하여 제외
+                    ORDER BY 
+                        C.orderDateTime DESC, OD.itemNo
+                ";
+    
+                // 쿼리 준비 및 실행
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
+                $stmt->bindParam(':startDate', $startDate, PDO::PARAM_STR);
+                $stmt->bindParam(':endDate', $endDate, PDO::PARAM_STR);
+                $stmt->execute();
+    
+                // 결과를 배열로 가져오기
+                $userOrders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+                // 결과를 JSON으로 변환하여 응답
+                echo json_encode([
+                    'success' => true,
+                    'data' => $userOrders
+                ]);
+            } catch (Exception $e) {
+                echo json_encode([
+                    'success' => false,
+                    'message' => '주문 내역을 불러오는 중 오류 발생: ' . $e->getMessage()
+                ]);
+            }
+        } else {
+            echo json_encode([
+                'success' => false,
+                'message' => '유효한 시작 날짜, 종료 날짜, 또는 사용자가 필요합니다.'
+            ]);
+        }
     } else {
         echo json_encode(array('success' => false, 'message' => '유효하지 않은 action입니다.'));
     }
@@ -192,14 +260,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     
         if ($itemId && $quantity) {
             try {
+                // 1. unitPrice를 가져오기 위해 foodName을 조회
+                $query = '
+                    SELECT F.price 
+                    FROM OrderDetail OD
+                    JOIN Food F ON OD.foodName = F.foodName
+                    WHERE OD.itemNo = :itemId AND OD.id = :orderId
+                ';
+                
+                $stmt = $conn->prepare($query);
+                $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
+                $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
+                $stmt->execute();
+                $food = $stmt->fetch(PDO::FETCH_ASSOC);
+                
+                if (!$food) {
+                    throw new Exception('해당 아이템을 찾을 수 없습니다.');
+                }
+    
+                $unitPrice = $food['PRICE'];
+                $totalPrice = $quantity * $unitPrice;
+    
+                // 2. quantity와 totalPrice를 업데이트
                 $query = '
                     UPDATE OrderDetail
-                    SET quantity = :quantity
+                    SET quantity = :quantity, totalPrice = :totalPrice
                     WHERE itemNo = :itemId AND id = :orderId
                 ';
     
                 $stmt = $conn->prepare($query);
                 $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
+                $stmt->bindParam(':totalPrice', $totalPrice, PDO::PARAM_INT);
                 $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
                 $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
                 $stmt->execute();
@@ -320,7 +411,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 $currentDateTime = date('Y-m-d H:i:s');
 
                 // 사용자의 가장 최근 장바구니 찾기
-                $query = 'SELECT id FROM Cart WHERE cno = :userId ORDER BY orderDateTime DESC FETCH FIRST 1 ROWS ONLY';
+                $query = 'SELECT id FROM Cart WHERE cno = :userId ORDER BY id DESC FETCH FIRST 1 ROWS ONLY';
                 $stmt = $conn->prepare($query);
                 $stmt->bindParam(':userId', $userId, PDO::PARAM_STR);
                 $stmt->execute();

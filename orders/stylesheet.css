@@ -1,0 +1,118 @@
+/* Styling for the order history section */
+.order-history-section {
+    height: 40rem;
+    overflow-y: auto;
+    margin-top: 20px;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+/* Individual order items */
+.order-item {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.order-item:last-child {
+    border-bottom: none;
+}
+
+/* Column styling */
+.col-12.col-md-2, .col-12.col-md-1 {
+    padding: 5px;
+}
+
+/* Order group and food items */
+.order-group {
+    margin-bottom: 20px;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* Order date as title with separator */
+.order-date {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 1rem;
+}
+
+/* Food item layout using flex display */
+.food-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 5px;
+    line-height: 1.5rem;
+}
+
+/* Aligning food name, quantity, and price with tab-like effect */
+.food-item span {
+    flex-basis: 0;
+    flex-grow: 1;
+    text-align: left;
+    white-space: pre; /* 탭 효과를 유지하기 위한 설정 */
+}
+
+.food-item .symbol, .food-item .quantity, .food-item .price {
+    flex-basis: auto;
+    flex-grow: 0;
+    text-align: right;
+    margin: 0 5px; /* 간격 조정 */
+}
+
+/* Ensure the lines and symbols align properly */
+.food-item .symbol {
+    flex-grow: 0;
+    text-align: center;
+    margin: 0 10px;
+}
+
+.food-item .price {
+    flex-basis: 100px;
+    text-align: right;
+}
+
+/* Summary and total price aligned to the right */
+.summary {
+    border-top: 1px solid #ddd;
+    padding-top: 1rem;
+    margin-top: 1rem;
+    text-align: right;
+    font-weight: bold;
+}
+
+/* 기본 설정 - 모든 order-group은 flex: 1로 균등 분배 */
+.order-group-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* 각 주문 내역 간의 간격 */
+    justify-content: flex-start; /* 왼쪽 정렬 */
+}
+
+.order-group-wrapper .order-group {
+    flex: 1 1 auto; /* 아이템들이 가능한 공간을 균등하게 차지함 */
+    min-width: calc(33.333% - 20px); /* 최소 너비를 설정하여 한 줄에 3개까지 배치 가능 */
+    box-sizing: border-box;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+/* 작은 화면에서는 전체 너비 사용 */
+@media (max-width: 768px) {
+    .order-group-wrapper .order-group {
+        min-width: calc(100% - 20px); /* 모든 그룹이 전체 너비 사용 */
+    }
+}
+
+

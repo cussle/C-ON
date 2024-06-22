@@ -1,4 +1,6 @@
 <?php
+date_default_timezone_set('Asia/Seoul');
+
 session_start();
 
 // 데이터베이스 연결 정보
