@@ -126,20 +126,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             // 필요시 추가: FETCH FIRST 10 ROWS ONLY
             $query = '
                 SELECT 
-                    F.foodName AS FoodName,
+                    F.foodName AS FoodName, -- 음식 이름
                     EXTRACT(DAY FROM (SYSDATE - C.orderDateTime)) * 24 * 60 + 
                     EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) * 60 + 
-                    EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS TotalMinutesAgo,
-                    EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) AS HoursAgo,
-                    EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS MinutesAgo
+                    EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS TotalMinutesAgo, -- 현재 시각으로부터 몇 분 전에 주문되었는지 계산
+                    EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) AS HoursAgo, -- 현재 시각으로부터 몇 시간 전에 주문되었는지 계산
+                    EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS MinutesAgo -- 현재 시각으로부터 몇 분 전에 주문되었는지 계산
                 FROM 
-                    OrderDetail O
+                    OrderDetail O -- 주문 상세 테이블
                 JOIN 
-                    Food F ON O.foodName = F.foodName
+                    Food F ON O.foodName = F.foodName -- 음식 테이블과 조인하여 음식 정보를 가져옴
                 JOIN 
-                    Cart C ON O.id = C.id
+                    Cart C ON O.id = C.id -- 카트 테이블과 조인하여 주문 시간 정보를 가져옴
+                WHERE
+                    C.id NOT IN (
+                        SELECT MAX(C2.id)
+                        FROM Cart C2
+                        GROUP BY C2.cno
+                    ) -- 각 사용자의 가장 최근의 카트 ID를 제외하여 실제 결제가 이루어진 주문만 선택
                 ORDER BY 
-                    C.orderDateTime DESC
+                    C.orderDateTime DESC -- 주문 시간 내림차순으로 정렬하여 최근 주문이 먼저 오도록 함
             ';
     
             $stmt = $conn->prepare($query);
@@ -153,22 +159,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             if ($userId) {
                 $userQuery = '
                     SELECT 
-                        F.foodName AS FoodName,
+                        F.foodName AS FoodName, -- 음식 이름
                         EXTRACT(DAY FROM (SYSDATE - C.orderDateTime)) * 24 * 60 + 
                         EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) * 60 + 
-                        EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS TotalMinutesAgo,
-                        EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) AS HoursAgo,
-                        EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS MinutesAgo
+                        EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS TotalMinutesAgo, -- 현재 시각으로부터 몇 분 전에 주문되었는지 계산
+                        EXTRACT(HOUR FROM (SYSDATE - C.orderDateTime)) AS HoursAgo, -- 현재 시각으로부터 몇 시간 전에 주문되었는지 계산
+                        EXTRACT(MINUTE FROM (SYSDATE - C.orderDateTime)) AS MinutesAgo -- 현재 시각으로부터 몇 분 전에 주문되었는지 계산
                     FROM 
-                        OrderDetail O
+                        OrderDetail O -- 주문 상세 테이블
                     JOIN 
-                        Food F ON O.foodName = F.foodName
+                        Food F ON O.foodName = F.foodName -- 음식 테이블과 조인하여 음식 정보를 가져옴
                     JOIN 
-                        Cart C ON O.id = C.id
+                        Cart C ON O.id = C.id -- 카트 테이블과 조인하여 주문 시간 정보를 가져옴
                     WHERE 
-                        C.cno = :userId
+                        C.cno = :userId -- 로그인한 사용자의 ID와 일치하는 주문을 선택
+                        AND C.id NOT IN (
+                            SELECT MAX(C2.id)
+                            FROM Cart C2
+                            WHERE C2.cno = :userId
+                        ) -- 사용자의 가장 최근의 카트 ID를 제외하여 실제 결제가 이루어진 주문만 선택
                     ORDER BY 
-                        C.orderDateTime DESC
+                        C.orderDateTime DESC -- 주문 시간 내림차순으로 정렬하여 최근 주문이 먼저 오도록 함
                 ';
     
                 $userStmt = $conn->prepare($userQuery);
