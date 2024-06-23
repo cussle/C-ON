@@ -249,20 +249,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     } else if ($action == 'getCategorySales') {
         // SQL문 1: 카테고리별 음식 총 판매량과 총 판매 금액을 계산하는 쿼리
-        $query = "
+        $query = '
+            -- 카테고리별 음식 총 판매량과 총 판매 금액을 계산하는 쿼리
             SELECT 
-                c.categoryName AS \"Category\",
-                COUNT(od.foodName) AS \"Total Sales\",
-                SUM(od.totalPrice) AS \"Total Revenue\"
+                c.categoryName AS "Category",  -- Category 컬럼을 카테고리 이름으로 표시
+                COUNT(od.foodName) AS "Total Sales",  -- 각 카테고리에서 판매된 음식의 총 수량을 계산하여 Total Sales 컬럼으로 표시
+                SUM(od.totalPrice) AS "Total Revenue"  -- 각 카테고리에서 발생한 총 판매 금액을 계산하여 Total Revenue 컬럼으로 표시
             FROM 
-                OrderDetail od
-                JOIN Contain ct ON od.foodName = ct.foodName
-                JOIN Category c ON ct.categoryName = c.categoryName
-            GROUP BY ROLLUP(c.categoryName)
+                OrderDetail od  -- OrderDetail 테이블을 od 별칭으로 사용
+                JOIN Contain ct ON od.foodName = ct.foodName  -- OrderDetail과 Contain 테이블을 foodName을 기준으로 조인
+                JOIN Category c ON ct.categoryName = c.categoryName  -- Contain과 Category 테이블을 categoryName을 기준으로 조인
+            GROUP BY ROLLUP(c.categoryName)  -- ROLLUP 함수를 사용하여 카테고리별로 그룹화하고, 총합계를 계산
             ORDER BY 
-                \"Total Sales\" ASC,
-                \"Total Revenue\" ASC
-        ";
+                "Total Sales" ASC,  -- 총 판매량을 기준으로 오름차순 정렬
+                "Total Revenue" ASC  -- 총 판매 금액을 기준으로 오름차순 정렬
+        ';
 
         try {
             $stmt = $conn->prepare($query);
@@ -275,21 +276,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
     } else if ($action == 'getCategorySalesRank') {
         // SQL문 2: 음식의 카테고리별 판매 순위를 계산하는 쿼리
-        $query = "
+        $query = '
+            -- 음식의 카테고리별 판매 순위를 계산하는 쿼리
             SELECT 
-                c.categoryName AS \"Category\",
-                od.foodName AS \"Food Name\",
-                SUM(od.totalPrice) AS \"Total Revenue\",
-                RANK() OVER (PARTITION BY c.categoryName ORDER BY SUM(od.totalPrice) DESC) AS \"Rank\"
+                c.categoryName AS "Category",  -- Category 컬럼을 카테고리 이름으로 표시
+                od.foodName AS "Food Name",  -- Food Name 컬럼을 음식 이름으로 표시
+                SUM(od.totalPrice) AS "Total Revenue",  -- 각 음식의 총 판매 금액을 계산하여 Total Revenue 컬럼으로 표시
+                RANK() OVER (PARTITION BY c.categoryName ORDER BY SUM(od.totalPrice) DESC) AS "Rank"  -- 카테고리별로 나누어 총 판매 금액 기준 내림차순으로 순위를 매겨 Rank 컬럼으로 표시
             FROM 
-                OrderDetail od
-                JOIN Contain ct ON od.foodName = ct.foodName
-                JOIN Category c ON ct.categoryName = c.categoryName
+                OrderDetail od  -- OrderDetail 테이블을 od 별칭으로 사용
+                JOIN Contain ct ON od.foodName = ct.foodName  -- OrderDetail과 Contain 테이블을 foodName을 기준으로 조인
+                JOIN Category c ON ct.categoryName = c.categoryName  -- Contain과 Category 테이블을 categoryName을 기준으로 조인
             GROUP BY 
-                c.categoryName, od.foodName
+                c.categoryName, od.foodName  -- 카테고리와 음식별로 그룹화
             ORDER BY 
-                c.categoryName, \"Rank\"
-        ";
+                c.categoryName, "Rank"  -- 결과를 카테고리와 순위별로 정렬
+        ';
 
         try {
             $stmt = $conn->prepare($query);
@@ -306,12 +308,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             SELECT 
                 c.cno AS \"cno\",
                 c.name AS \"name\",
-                c.email AS \"email\",
-                c.phone AS \"phone\"
+                c.passwd AS \"passwd\",
+                c.phoneno AS \"phoneno\"
             FROM 
                 Customer c
             ORDER BY 
-                c.name ASC
+                c.cno ASC
         ";
 
         try {

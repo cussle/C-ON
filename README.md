@@ -37,8 +37,8 @@
 - [X] 시작 날짜와 종료 날짜를 지정하여 주문 내역 조회 
 
 ### 5. 통계 정보
-- [ ] 그룹 함수를 이용한 질의
-- [ ] 윈도우 함수를 이용한 질의
+- [X] 그룹 함수를 이용한 질의
+- [X] 윈도우 함수를 이용한 질의
 
 ## 기술 스택
 - **HTML5**: [HTML5 Documentation](https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/HTML5)

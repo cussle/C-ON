@@ -1,20 +1,30 @@
 #member-management, .statistics {
     background-color: #ffffff;
     border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    border: 1px solid black;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
     padding: 20px;
     margin-bottom: 20px;
 }
 
 h2 {
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
     font-weight: 700;
 }
 
-div.row.my-3 {
+/* Flexbox를 사용하여 동일한 높이로 설정 */
+.row.my-5 {
+    display: flex;  /* 자식 요소들을 flex item으로 만듭니다. */
+    justify-content: space-around;  /* 자식 요소들을 수평으로 공간을 동일하게 배치합니다. */
+    align-items: stretch;  /* 자식 요소들의 높이를 동일하게 맞춥니다. */
     margin: 0 auto;
 }
+
+/* 필요한 경우 자식 요소들의 크기를 강제 조정할 수도 있습니다. */
+.col-12.col-md-6 {
+    flex: 1; /* 부모의 전체 높이에 걸쳐 동일하게 확장됩니다. */
+}
+
 
 #total-sales-revenue, #category-sales-rank {
     height: 300px;
@@ -23,7 +33,7 @@ div.row.my-3 {
 }
 
 #member-info {
-    height: 300px;
+    height: 700px;
     overflow-y: auto;
     padding: 10px;
 }
