@@ -1,48 +1,52 @@
 $(document).ready(function() {
-    // 로그인 상태 확인
-    $.ajax({
-        url: authURL,
-        method: "GET",
-        dataType: "json",
-        success: function(response) {
-            if (response.logged_in) {
-                $('.to-login').off('click');
-                $("#toCart").text("장바구니 담기");
+    /* 깃허브 page용 예외 처리 */
+    
+    if (!window.location.href.includes('github')) {
+        // 로그인 상태 확인
+        $.ajax({
+            url: authURL,
+            method: "GET",
+            dataType: "json",
+            success: function(response) {
+                if (response.logged_in) {
+                    $('.to-login').off('click');
+                    $("#toCart").text("장바구니 담기");
 
-                // "장바구니 담기" 버튼 클릭 이벤트
-                $("#toCart").on("click", function() {
-                    // 선택된 메뉴 항목의 정보를 가져옵니다.
-                    const itemTitle = $("#menuDetailLabel").text(); // 메뉴의 제목(음식 이름)
+                    // "장바구니 담기" 버튼 클릭 이벤트
+                    $("#toCart").on("click", function() {
+                        // 선택된 메뉴 항목의 정보를 가져옵니다.
+                        const itemTitle = $("#menuDetailLabel").text(); // 메뉴의 제목(음식 이름)
 
-                    // 서버로 장바구니 추가 요청을 보냅니다.
-                    $.ajax({
-                        url: '../server.php',
-                        type: 'POST',
-                        data: {
-                            action: 'addToCart',
-                            foodName: itemTitle
-                        },
-                        dataType: 'json',
-                        success: function(response) {
-                            console.log(response);
-                            if (response.success) {
-                                showToast('장바구니에 추가되었습니다.');
-                            } else {
-                                console.log(response.message);
-                                showToast('장바구니에 추가하지 못했습니다: ' + response.message, 3000, true);
+                        // 서버로 장바구니 추가 요청을 보냅니다.
+                        $.ajax({
+                            url: '../server.php',
+                            type: 'POST',
+                            data: {
+                                action: 'addToCart',
+                                foodName: itemTitle
+                            },
+                            dataType: 'json',
+                            success: function(response) {
+                                console.log(response);
+                                if (response.success) {
+                                    showToast('장바구니에 추가되었습니다.');
+                                } else {
+                                    console.log(response.message);
+                                    showToast('장바구니에 추가하지 못했습니다: ' + response.message, 3000, true);
+                                }
+                            },
+                            error: function() {
+                                showToast('서버와의 통신 중 오류가 발생했습니다.', 3000, true);
                             }
-                        },
-                        error: function() {
-                            showToast('서버와의 통신 중 오류가 발생했습니다.', 3000, true);
-                        }
+                        });
                     });
-                });
+                }
+            },
+            error: function() {
+                console.error("로그인 상태를 확인하는 중 오류가 발생했습니다.");
             }
-        },
-        error: function() {
-            console.error("로그인 상태를 확인하는 중 오류가 발생했습니다.");
-        }
-    });
+        });
+    }
 
 
 

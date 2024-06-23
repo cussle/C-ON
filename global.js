@@ -3,6 +3,11 @@ function startLoad() { $('.loading-page').addClass('show'); } // fade-in (로딩
 function endLoad() { $('.loading-page').removeClass('show'); } // fade-out (로딩 종료시)
 $(document).ready(function() {
     startLoad();
+    
+    /* 깃허브 page용 예외 처리 */
+    if (window.location.href.includes('github')) {
+        $("#github-message").show();
+    }
 
     // 페이지 로딩 후 로그인 상태 확인
     checkLoginStatus();
@@ -122,4 +127,25 @@ function logout() {
             }
         });
     }
+}
+
+
+
+/* 깃허브 page용 로그인 처리 */
+function forceLogin() {
+    // 로그인된 상태일 경우 내비게이션 아이템 수정
+    let buttonsHtml = `
+        <div class="welcome-message">안녕하세요, 테스터님!</div>
+        <button class="scale-button" onclick="location.href='${baseURL}cart'">장바구니</button>
+        <button class="scale-button" onclick="location.href='${baseURL}orders'">주문내역</button>
+    `;
+
+    // cno가 C0인 경우 통계 정보 버튼 추가
+    buttonsHtml += `<button class="scale-button admin-button" onclick="location.href='${baseURL}statistics'">통계 정보</button>`;
+
+    // Logout 버튼은 항상 마지막에 추가
+    buttonsHtml += `<button class="scale-button" onclick="logout()">Logout</button>`;
+
+    $('#nav .nav-btns').html(buttonsHtml);
+    showToast("로그인 상태로 변경하였습니다.");
 }

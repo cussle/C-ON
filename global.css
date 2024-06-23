@@ -326,3 +326,27 @@ body{
     max-width: 100px; /* Reduce the maximum width for the button */
     flex: none; /* Ensure the button does not grow like the other items */
 }
+
+
+
+/* 깃허브 page용 경고 메시지 */
+#github-message {
+    display: none;
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    line-height: 1.2rem;
+    background-color: rgba(255, 255, 255, 0.7); /* 반투명한 흰색 배경 */
+    color: black;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 9999; /* 다른 콘텐츠 위에 표시되도록 z-index 설정 */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* 그림자 효과 */
+}
+
+#force-login {
+    color: var(--CnuBlue);
+    cursor: pointer;
+    font-weight: bold;
+}

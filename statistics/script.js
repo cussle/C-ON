@@ -1,27 +1,30 @@
 $(document).ready(function() {
-    // 로그인된 사용자만 접근 가능
-    $.ajax({
-        url: '../login/auth.php',
-        method: "GET",
-        dataType: "json",
-        success: function(response) {
-            if (!response.logged_in) {
-                window.location.href = "../login";
-            }
+    /* 깃허브 page용 예외 처리 */
+    
+    if (!window.location.href.includes('github')) {
+        // 로그인된 사용자만 접근 가능
+        $.ajax({
+            url: '../login/auth.php',
+            method: "GET",
+            dataType: "json",
+            success: function(response) {
+                if (!response.logged_in) {
+                    window.location.href = "../login";
+                }
 
-            // cno가 C0인 경우 통계 정보 버튼 추가
-            if (response.user === 'C0') {
-                fetchMemberInfo();
-                fetchStatistics();
-            } else {
-                showToast("인가되지 않은 사용자입니다.", 24*60*60*1000, true);
+                // cno가 C0인 경우 통계 정보 버튼 추가
+                if (response.user === 'C0') {
+                    fetchMemberInfo();
+                    fetchStatistics();
+                } else {
+                    showToast("인가되지 않은 사용자입니다.", 24*60*60*1000, true);
+                }
+            },
+            error: function() {
+                console.error("로그인 상태를 확인하는 중 오류가 발생했습니다.");
             }
-        },
-        error: function() {
-            console.error("로그인 상태를 확인하는 중 오류가 발생했습니다.");
-        }
-    });
-
+        });
+    }
 
     
     // Function to fetch member information
