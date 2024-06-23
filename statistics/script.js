@@ -22,8 +22,11 @@ $(document).ready(function() {
         }
     });
 
+
+    
     // Function to fetch member information
     function fetchMemberInfo() {
+        startLoad(); // 로딩 시작
         $.ajax({
             url: '../server.php',
             method: 'GET',
@@ -37,12 +40,16 @@ $(document).ready(function() {
                 } else {
                     showError('member-info', response.message);
                 }
+                endLoad(); // 로딩 종료
             },
             error: function(error) {
                 console.error('Error fetching member info:', error);
+                endLoad(); // 로딩 종료
             }
         });
     }
+
+
 
     // Function to display member information
     function displayMemberInfo(members) {
@@ -80,14 +87,19 @@ $(document).ready(function() {
         $memberInfo.append($table);
     }
 
+
+
     // Function to fetch and display statistics data
     function fetchStatistics() {
         fetchTotalSalesRevenue();
         fetchCategorySalesRank();
     }
 
+
+
     // Fetch category sales and revenue
     function fetchTotalSalesRevenue() {
+        startLoad(); // 로딩 시작
         $.ajax({
             url: '../server.php',
             method: 'GET',
@@ -101,12 +113,16 @@ $(document).ready(function() {
                 } else {
                     showError('total-sales-revenue', response.message);
                 }
+                endLoad(); // 로딩 종료
             },
             error: function(error) {
                 console.error('Error fetching total sales and revenue:', error);
+                endLoad(); // 로딩 종료
             }
         });
     }
+
+
 
     // Display total sales and revenue
     function displayTotalSalesRevenue(data) {
@@ -188,8 +204,11 @@ $(document).ready(function() {
         $('#total-revenue-summary').text(`총 판매 금액 합계: ${Number(totalRevenueSum).toLocaleString()} 원`);
     }
 
+
+
     // Fetch category sales rank
     function fetchCategorySalesRank() {
+        startLoad(); // 로딩 시작
         $.ajax({
             url: '../server.php',
             method: 'GET',
@@ -203,12 +222,16 @@ $(document).ready(function() {
                 } else {
                     showError('category-sales-rank', response.message);
                 }
+                endLoad(); // 로딩 종료
             },
             error: function(error) {
                 console.error('Error fetching category sales rank:', error);
+                endLoad(); // 로딩 종료
             }
         });
     }
+
+
 
     // Display category sales rank
     function displayCategorySalesRank(data) {
@@ -274,6 +297,8 @@ $(document).ready(function() {
             }
         });
     }
+
+
 
     // Show error messages
     function showError(containerId, message) {

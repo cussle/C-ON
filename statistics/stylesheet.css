@@ -14,15 +14,14 @@ h2 {
 
 /* Flexbox를 사용하여 동일한 높이로 설정 */
 .row.my-5 {
-    display: flex;  /* 자식 요소들을 flex item으로 만듭니다. */
-    justify-content: space-around;  /* 자식 요소들을 수평으로 공간을 동일하게 배치합니다. */
-    align-items: stretch;  /* 자식 요소들의 높이를 동일하게 맞춥니다. */
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
     margin: 0 auto;
 }
 
-/* 필요한 경우 자식 요소들의 크기를 강제 조정할 수도 있습니다. */
 .col-12.col-md-6 {
-    flex: 1; /* 부모의 전체 높이에 걸쳐 동일하게 확장됩니다. */
+    flex: 1;
 }
 
 .statistics {
@@ -41,7 +40,6 @@ h2 {
     text-align: center;
     margin-top: 10px; /* 위와의 간격 추가 */
 }
-
 
 #member-info {
     height: 700px;

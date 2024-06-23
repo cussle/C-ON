@@ -48,6 +48,8 @@ $(document).ready(function() {
             return; // 함수 종료
         }
 
+        startLoad(); // 로딩 시작
+
         // AJAX 요청으로 주문 내역 가져오기
         $.ajax({
             url: '../server.php',
@@ -139,9 +141,11 @@ $(document).ready(function() {
                     // Append the centered container to the orderHistoryList
                     $('#orderHistoryList').append($centeredContainer);
                 }
+                endLoad(); // 로딩 종료
             },
             error: function(error) {
                 console.error('Error fetching order history:', error);
+                endLoad(); // 로딩 종료
             }
         });
 
