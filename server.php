@@ -207,29 +207,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             try {
                 $query = "
                     SELECT 
-                        F.foodName AS FoodName,
-                        C.orderDateTime AS OrderDateTime,
-                        OD.quantity AS Quantity,
-                        OD.totalPrice AS TotalPrice,
-                        C.id AS OrderID
+                        F.foodName AS FoodName, -- 음식 이름
+                        C.orderDateTime AS OrderDateTime, -- 주문 시간
+                        OD.quantity AS Quantity, -- 주문 수량
+                        OD.totalPrice AS TotalPrice, -- 총 가격
+                        C.id AS OrderID -- 주문 ID
                     FROM 
-                        OrderDetail OD
+                        OrderDetail OD -- 주문 상세 테이블
                     JOIN 
-                        Food F ON OD.foodName = F.foodName
+                        Food F ON OD.foodName = F.foodName -- 음식 테이블과 조인
                     JOIN 
-                        Cart C ON OD.id = C.id
+                        Cart C ON OD.id = C.id -- 카트 테이블과 조인
                     JOIN 
-                        Customer CU ON C.cno = CU.cno
+                        Customer CU ON C.cno = CU.cno -- 고객 테이블과 조인
                     WHERE 
-                        CU.cno = :userId -- 특정 사용자의 ID를 지정
-                        AND C.orderDateTime BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD') -- 날짜 범위 지정
-                        AND TO_NUMBER(SUBSTR(C.id, 2)) < (
-                            SELECT MAX(TO_NUMBER(SUBSTR(id, 2)))
-                            FROM Cart
-                            WHERE cno = :userId
-                        ) -- 현재 장바구니 내역의 숫자 부분을 최대 값으로 비교하여 제외
+                        CU.cno = :userId -- 특정 사용자의 ID를 필터링
+                        AND C.orderDateTime BETWEEN TO_DATE(:startDate, 'YYYY-MM-DD') AND TO_DATE(:endDate, 'YYYY-MM-DD') -- 지정된 날짜 범위 내의 주문만 선택
+                        AND C.id < (
+                            SELECT MAX(C2.id)
+                            FROM Cart C2
+                            WHERE C2.cno = :userId
+                        ) -- 현재 사용자의 최신 카트 ID보다 작은 ID의 주문만 선택 (결제가 완료된 주문)
                     ORDER BY 
-                        C.orderDateTime DESC, OD.itemNo
+                        C.orderDateTime DESC, OD.itemNo -- 주문 시간 기준으로 내림차순 정렬, 아이템 번호로 정렬
                 ";
     
                 // 쿼리 준비 및 실행

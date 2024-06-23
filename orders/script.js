@@ -14,6 +14,8 @@ $(document).ready(function() {
         }
     });
 
+
+
     // Function to set default dates
     function setDefaultDates() {
         const today = new Date();
@@ -33,8 +35,7 @@ $(document).ready(function() {
         $('#end-date').val(formatDate(tomorrow));
     }
 
-    // Set default dates when the page loads
-    setDefaultDates();
+
 
     // Function to fetch and display order history based on date filters
     function fetchOrderHistory() {
@@ -147,11 +148,17 @@ $(document).ready(function() {
         showToast("주문내역을 불러왔습니다.");
     }
 
+
+
     // Attach event handler to the search button
     $('#search-button').on('click', function() {
         fetchOrderHistory();
     });
 
+
+
+    // Set default dates when the page loads
+    setDefaultDates();
     // Initial fetch of order history on page load
     fetchOrderHistory();
 });
