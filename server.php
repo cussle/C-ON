@@ -247,6 +247,82 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 'message' => '유효한 시작 날짜, 종료 날짜, 또는 사용자가 필요합니다.'
             ]);
         }
+    } else if ($action == 'getCategorySales') {
+        // SQL문 1: 카테고리별 음식 총 판매량과 총 판매 금액을 계산하는 쿼리
+        $query = "
+            SELECT 
+                c.categoryName AS \"Category\",
+                COUNT(od.foodName) AS \"Total Sales\",
+                SUM(od.totalPrice) AS \"Total Revenue\"
+            FROM 
+                OrderDetail od
+                JOIN Contain ct ON od.foodName = ct.foodName
+                JOIN Category c ON ct.categoryName = c.categoryName
+            GROUP BY ROLLUP(c.categoryName)
+            ORDER BY 
+                \"Total Sales\" ASC,
+                \"Total Revenue\" ASC
+        ";
+
+        try {
+            $stmt = $conn->prepare($query);
+            $stmt->execute();
+            $categorySales = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode(array('success' => true, 'data' => $categorySales));
+        } catch (PDOException $e) {
+            echo json_encode(array('success' => false, 'message' => '쿼리 실행 실패: ' . $e->getMessage()));
+        }
+    } else if ($action == 'getCategorySalesRank') {
+        // SQL문 2: 음식의 카테고리별 판매 순위를 계산하는 쿼리
+        $query = "
+            SELECT 
+                c.categoryName AS \"Category\",
+                od.foodName AS \"Food Name\",
+                SUM(od.totalPrice) AS \"Total Revenue\",
+                RANK() OVER (PARTITION BY c.categoryName ORDER BY SUM(od.totalPrice) DESC) AS \"Rank\"
+            FROM 
+                OrderDetail od
+                JOIN Contain ct ON od.foodName = ct.foodName
+                JOIN Category c ON ct.categoryName = c.categoryName
+            GROUP BY 
+                c.categoryName, od.foodName
+            ORDER BY 
+                c.categoryName, \"Rank\"
+        ";
+
+        try {
+            $stmt = $conn->prepare($query);
+            $stmt->execute();
+            $categorySalesRank = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode(array('success' => true, 'data' => $categorySalesRank));
+        } catch (PDOException $e) {
+            echo json_encode(array('success' => false, 'message' => '쿼리 실행 실패: ' . $e->getMessage()));
+        }
+    } else if ($action == 'getMembers') {
+        // 회원 정보 조회 쿼리
+        $query = "
+            SELECT 
+                c.cno AS \"cno\",
+                c.name AS \"name\",
+                c.email AS \"email\",
+                c.phone AS \"phone\"
+            FROM 
+                Customer c
+            ORDER BY 
+                c.name ASC
+        ";
+
+        try {
+            $stmt = $conn->prepare($query);
+            $stmt->execute();
+            $members = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            echo json_encode(array('success' => true, 'data' => $members));
+        } catch (PDOException $e) {
+            echo json_encode(array('success' => false, 'message' => '쿼리 실행 실패: ' . $e->getMessage()));
+        }
     } else {
         echo json_encode(array('success' => false, 'message' => '유효하지 않은 action입니다.'));
     }

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- meta -->
+    <meta charset="UTF-8">
+    <meta name="author" content="202002521 이경빈">
+    <meta name="keywords" content="C-ON, CNU, 충남대학교, 메뉴, 주문, 결제, 음식">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C-ON | 관리자 화면</title>
+
+    <!-- favicon -->
+    <link rel="apple-touch-icon" sizes="180x180" href="../src/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="../src/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="../src/favicon/favicon-16x16.png">
+    <link rel="manifest" href="../src/favicon/site.webmanifest">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Noto+Sans+KR:wght@100..900&display=swap" rel="stylesheet">
+
+    <!-- stylesheet -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../global.css">
+    <link rel="stylesheet" href="stylesheet.css">
+
+    <!-- script -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../global.js"></script>
+    <script src="script.js"></script>
+</head>
+<body>
+    <!-- loading -->
+    <div id="loadingPage" class="loading-page">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container-fluid">
+        <!-- Logo and Login Button Section -->
+        <div class="row align-items-center py-3" id="nav">
+            <div class="col-6">
+                <div class="main-logo">
+                    <a href="../index.html">
+                        <img src="../src/logo/logo.png" alt="Main Logo" class="img-fluid">
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- 회원 관리 및 통계 정보 섹션 -->
+        <div class="row my-3">
+            <div class="col-12 col-md-6" id="member-management">
+                <h2>회원 관리</h2>
+                <div id="member-info">
+                    <!-- 회원 정보를 불러오는 중... -->
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="statistics">
+                    <h2>카테고리별 음식 총 판매량 및 금액</h2>
+                    <div id="total-sales-revenue">
+                        <!-- 데이터 로딩 표시 -->
+                        <p>데이터를 불러오는 중...</p>
+                    </div>
+                </div>
+                <div class="statistics">
+                    <h2>음식의 카테고리별 판매 순위</h2>
+                    <div id="category-sales-rank">
+                        <!-- 데이터 로딩 표시 -->
+                        <p>데이터를 불러오는 중...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
