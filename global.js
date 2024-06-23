@@ -19,6 +19,8 @@ $(document).ready(function() {
     });
 });
 
+
+
 /* Toast Notification */
 function showToast(message, duration = 3000, warning = false) {
     const toastContainer = document.getElementById('toast-container');
@@ -57,6 +59,9 @@ function showToast(message, duration = 3000, warning = false) {
     }
 }
 
+
+
+/* 로그인 상태 관리 */
 // 현재 페이지 경로와 script 경로 가져오기
 const currentPath = window.location.pathname;
 const scriptPath = document.currentScript.src;
@@ -77,6 +82,7 @@ function checkLoginStatus() {
         dataType: 'json',
         success: function(response) {
             if (response.logged_in) {
+                // 로그인된 상태일 경우 내비게이션 아이템 수정
                 let buttonsHtml = `
                     <div class="welcome-message">안녕하세요, ${response.name}님!</div>
                     <button class="scale-button" onclick="location.href='${baseURL}cart'">장바구니</button>
@@ -100,11 +106,12 @@ function checkLoginStatus() {
     });
 }
 
+
 /* 로그아웃 함수 */
 function logout() {
     if (window.confirm("로그아웃 하시겠습니까?")) {
         $.ajax({
-            url: authURL, // 통합된 PHP 파일로 요청
+            url: authURL,
             method: 'POST',
             data: { action: 'logout' },
             success: function(response) {

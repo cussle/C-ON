@@ -75,15 +75,6 @@ body{
 
 
 
-/* 미구현 표시용 */
-p.unDeveloped {
-    text-align: center;
-    margin: 2.5rem; 
-    font-size: 1.5rem;
-}
-
-
-
 /* Page Loading */
 .loading-page {
     position: fixed;
@@ -273,10 +264,6 @@ p.unDeveloped {
 
 
 
-
-
-/* -------------- C-ON -------------- */
-
 /* Nav */
 #nav {
     box-shadow: 0 4px 2px -2px gray; /* 하단에만 그림자가 생기도록 설정 */
@@ -311,6 +298,7 @@ p.unDeveloped {
 }
 
 
+
 /* Search Section */
 .search-controls {
     margin: 2rem auto;
@@ -328,14 +316,12 @@ p.unDeveloped {
     gap: 3rem; /* Space between items */
 }
 
-/* Adjustments for individual search items */
 .search-item {
     flex: 1; /* Allow items to grow and take equal space */
     max-width: 400px; /* Increase maximum width */
     text-align: left; /* Align text to the left for better readability */
 }
 
-/* Search button adjustment */
 .search-button {
     max-width: 100px; /* Reduce the maximum width for the button */
     flex: none; /* Ensure the button does not grow like the other items */
