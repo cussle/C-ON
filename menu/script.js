@@ -44,6 +44,8 @@ $(document).ready(function() {
         }
     });
 
+
+
     // Function to create and append menu items to the search-results container
     function generateMenuItems(items) {
         const $container = $(".search-results .row");
@@ -104,6 +106,8 @@ $(document).ready(function() {
         });
     }
 
+
+
     // Function to populate the modal with the selected menu item details
     function showMenuItemDetails(item) {
         const $modalTitle = $("#menuDetailLabel");
@@ -116,6 +120,8 @@ $(document).ready(function() {
             <p><span>가격: </span>${item.price}</p>
         `);
     }
+
+
 
     $("#search-button").on("click", function() {
         startLoad();
@@ -187,7 +193,9 @@ $(document).ready(function() {
         });
     });
 
-    // URL의 "login" 파라미터를 확인하여 메뉴 제시
+
+
+    // URL의 파라미터를 확인하여 메뉴 제시
     const urlParams = new URLSearchParams(window.location.search);
     $("#category-select").val(urlParams.get("category"));
     $("#search-button").click();

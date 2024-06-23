@@ -1,4 +1,4 @@
-/* Range container adjustments */
+/* Range container */
 .range_container {
     display: flex;
     flex-direction: column;
@@ -6,25 +6,23 @@
     width: 100%;
 }
 
-/* Sliders control adjustments */
-.sliders_control {
+.sliders_control { /* Sliders control adjustments */
     width: 100%;
     display: flex;
     justify-content: space-between;
 }
 
-/* Form control container */
-.form_control {
+.form_control { /* Form control container */
     display: flex;
     justify-content: space-between;
     width: 100%;
     margin-top: 10px;
 }
 
-/* Input adjustments */
-.form_control_container__time__input {
-    width: 100px; /* Set a fixed width for number inputs */
+.form_control_container__time__input { /* Input adjustments */
+    width: 100px;
 }
+
 
 
 /* Search Results Section */
@@ -41,6 +39,7 @@
     flex-direction: column;
     justify-content: space-between;
     border-radius: 0.75rem;
+    cursor: pointer;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -74,6 +73,7 @@
     font-weight: bold;
     color: var(--CnuDarkBlue);
 }
+
 
 
 /* Modal */
