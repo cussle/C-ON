@@ -1,7 +1,6 @@
 /* Center the login form and make it look clean */
 body {
     background-color: #f2f2f2;
-    font-family: 'Nanum Gothic', 'Noto Sans KR', sans-serif;
 }
 
 .login-wrapper {
@@ -20,7 +19,7 @@ body {
 
 .login-wrapper h2 {
     font-weight: 700;
-    color: #333;
+    color: var(--CnuDarkBlue);
 }
 
 .login-wrapper .form-label {
@@ -28,19 +27,19 @@ body {
 }
 
 .login-wrapper .btn-primary {
-    background-color: #1a73e8;
-    border-color: #1a73e8;
+    background-color: var(--CnuSkyBlue);
+    border-color: var(--CnuSkyBlue);
 }
 
 .login-wrapper .btn-primary:hover {
-    background-color: #135ab7;
-    border-color: #135ab7;
+    background-color: var(--CnuBlue);
+    border-color: var(--CnuBlue);
 }
 
 .login-wrapper a {
-    color: #1a73e8;
+    color: var(--CnuSkyBlue);
 }
 
 .login-wrapper a:hover {
-    color: #135ab7;
+    color: var(--CnuBlue);
 }
