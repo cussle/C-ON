@@ -110,36 +110,82 @@ $(document).ready(function() {
 
     // Display total sales and revenue
     function displayTotalSalesRevenue(data) {
-        const $totalSalesRevenue = $('#total-sales-revenue');
-        $totalSalesRevenue.empty(); // Clear existing content
+        // 최종 합계 제외
+        const filteredData = data.filter(row => row.Category !== null);
 
-        if (data.length === 0) {
-            $totalSalesRevenue.append('<p class="text-muted">데이터가 없습니다.</p>');
-            return;
-        }
+        // Extract categories, sales and revenue for the chart
+        const categories = filteredData.map(row => row.Category);
+        const totalSales = filteredData.map(row => row["Total Sales"]);
+        const totalRevenue = filteredData.map(row => row["Total Revenue"]);
 
-        const $table = $('<table>').addClass('table table-striped');
-        $table.append(`
-            <thead>
-                <tr>
-                    <th>카테고리</th>
-                    <th>총 판매량</th>
-                    <th>총 판매 금액</th>
-                </tr>
-            </thead>
-            <tbody>
-        `);
+        // 총 판매 금액 합계 계산
+        const totalRevenueSum = data.find(item => item.Category === null)["Total Revenue"];
 
-        data.forEach(row => {
-            const $tr = $('<tr>');
-            $tr.append(`<td>${row.Category ?? "합계"}</td>`);
-            $tr.append(`<td>${row["Total Sales"]}</td>`);
-            $tr.append(`<td>${Number(row["Total Revenue"]).toLocaleString() + '원'}</td>`);
-            $table.append($tr);
+        // Create the chart using Chart.js
+        const ctx = document.getElementById('salesRevenueChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: categories,
+                datasets: [
+                    {
+                        label: '총 판매 금액 (원)',
+                        type: 'bar',
+                        data: totalRevenue,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        yAxisID: 'y1'
+                    },
+                    {
+                        label: '총 판매량',
+                        type: 'line',
+                        data: totalSales,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false,
+                        yAxisID: 'y2'
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y1: {
+                        type: 'linear',
+                        position: 'left',
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toLocaleString() + ' 원';
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '총 판매 금액'
+                        }
+                    },
+                    y2: {
+                        type: 'linear',
+                        position: 'right',
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value + ' 개';
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: '총 판매량'
+                        }
+                    }
+                }
+            }
         });
 
-        $table.append('</tbody>');
-        $totalSalesRevenue.append($table);
+        // Display the total revenue sum as text
+        $('#total-revenue-summary').text(`총 판매 금액 합계: ${Number(totalRevenueSum).toLocaleString()} 원`);
     }
 
     // Fetch category sales rank
@@ -166,38 +212,67 @@ $(document).ready(function() {
 
     // Display category sales rank
     function displayCategorySalesRank(data) {
-        const $categorySalesRank = $('#category-sales-rank');
-        $categorySalesRank.empty(); // Clear existing content
-
-        if (data.length === 0) {
-            $categorySalesRank.append('<p class="text-muted">데이터가 없습니다.</p>');
-            return;
-        }
-
-        const $table = $('<table>').addClass('table table-striped');
-        $table.append(`
-            <thead>
-                <tr>
-                    <th>카테고리</th>
-                    <th>음식 이름</th>
-                    <th>총 판매 금액</th>
-                    <th>순위</th>
-                </tr>
-            </thead>
-            <tbody>
-        `);
-
-        data.forEach(row => {
-            const $tr = $('<tr>');
-            $tr.append(`<td>${row.Category}</td>`);
-            $tr.append(`<td>${row["Food Name"]}</td>`);
-            $tr.append(`<td>${Number(row["Total Revenue"]).toLocaleString() + '원'}</td>`);
-            $tr.append(`<td>${row.Rank}</td>`);
-            $table.append($tr);
+        // Chart.js 사용을 위한 컨텍스트 가져오기
+        const ctx = document.getElementById('salesRankChart').getContext('2d');
+    
+        // 데이터 처리
+        const categories = data.map(item => item.Category);
+        const foodNames = data.map(item => item["Food Name"]);
+        const revenues = data.map(item => item["Total Revenue"]);
+        const ranks = data.map(item => item.Rank);
+    
+        // 차트의 높이를 데이터 항목 수에 따라 동적으로 설정
+        const chartHeight = foodNames.length * 20; // 항목당 높이 설정 (예: 40px)
+    
+        // Canvas의 높이 설정
+        document.getElementById('salesRankChart').height = chartHeight;
+    
+        // 차트 생성
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: foodNames,
+                datasets: [{
+                    label: '총 판매 금액 (원)',
+                    data: revenues,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y', // 수평 막대 차트로 설정
+                maintainAspectRatio: false, // 높이와 너비 비율 유지하지 않음
+                responsive: true,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: '총 판매 금액 (원)'
+                        }
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: '음식 이름'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return `${Number(tooltipItem.raw).toLocaleString()}원`;
+                            }
+                        }
+                    }
+                }
+            }
         });
-
-        $table.append('</tbody>');
-        $categorySalesRank.append($table);
     }
 
     // Show error messages

@@ -27,6 +27,7 @@
     <!-- script -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="../global.js"></script>
     <script src="script.js"></script>
 </head>
@@ -58,18 +59,20 @@
                 </div>
             </div>
             <div class="col-12 col-md-6">
+                <!-- 카테고리별 음식 총 판매량 및 금액 -->
                 <div class="statistics">
                     <h2>카테고리별 음식 총 판매량 및 금액</h2>
                     <div id="total-sales-revenue">
-                        <!-- 데이터 로딩 표시 -->
-                        <p>데이터를 불러오는 중...</p>
+                        <canvas id="salesRevenueChart" width="400" height="200"></canvas>
                     </div>
+                    <div id="total-revenue-summary" class="summary-text"></div>
                 </div>
+
+                <!-- 음식의 카테고리별 판매 순위 -->
                 <div class="statistics">
                     <h2>음식의 카테고리별 판매 순위</h2>
                     <div id="category-sales-rank">
-                        <!-- 데이터 로딩 표시 -->
-                        <p>데이터를 불러오는 중...</p>
+                        <canvas id="salesRankChart" width="400" height="200"></canvas>
                     </div>
                 </div>
             </div>
