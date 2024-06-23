@@ -77,34 +77,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         if ($userId) {
             $query = "
                 SELECT 
-                    C.id AS OrderID,
-                    C.orderDateTime AS OrderDateTime,
-                    C.cno AS CustomerNo,
-                    OD.itemNo AS ItemNo,
-                    OD.foodName AS FoodName,
-                    LISTAGG(CT.categoryName, ', ') WITHIN GROUP (ORDER BY CT.categoryName) AS CategoryNames,
-                    F.price AS UnitPrice,
-                    OD.quantity AS Quantity,
-                    OD.totalPrice AS TotalPrice
+                    C.id AS OrderID, -- 주문 ID
+                    C.orderDateTime AS OrderDateTime, -- 주문 시각
+                    C.cno AS CustomerNo, -- 고객 번호
+                    OD.itemNo AS ItemNo, -- 아이템 번호
+                    OD.foodName AS FoodName, -- 음식 이름
+                    -- 해당 음식의 모든 카테고리를 콤마로 구분하여 결합
+                    LISTAGG(CT.categoryName, ', ') WITHIN GROUP (ORDER BY CT.categoryName) AS CategoryNames, 
+                    F.price AS UnitPrice, -- 단가
+                    OD.quantity AS Quantity, -- 수량
+                    OD.totalPrice AS TotalPrice -- 총 가격
                 FROM 
-                    Cart C
+                    Cart C -- 카트 테이블
                 JOIN 
-                    OrderDetail OD ON C.id = OD.id
+                    OrderDetail OD ON C.id = OD.id -- 주문 상세 테이블과 조인
                 JOIN 
-                    Contain CT ON OD.foodName = CT.foodName
+                    Contain CT ON OD.foodName = CT.foodName -- 음식과 카테고리 연결 테이블과 조인
                 JOIN
-                    Food F ON OD.foodName = F.foodName
+                    Food F ON OD.foodName = F.foodName -- 음식 테이블과 조인
                 WHERE 
-                    C.cno = :userId
+                    C.cno = :userId -- 현재 사용자의 카트만 선택
                     AND C.id = (
                         SELECT MAX(id) 
                         FROM Cart 
-                        WHERE cno = :userId
+                        WHERE cno = :userId -- 가장 최근의 카트 ID 선택
                     )
                 GROUP BY 
                     C.id, C.orderDateTime, C.cno, OD.itemNo, OD.foodName, F.price, OD.quantity, OD.totalPrice
                 ORDER BY 
-                    C.orderDateTime, C.id, OD.itemNo
+                    C.orderDateTime, C.id, OD.itemNo -- 주문 시각, 주문 ID, 아이템 번호 순으로 정렬
             ";
     
             try {
@@ -339,14 +340,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     } else {
         echo json_encode(array('success' => false, 'message' => '유효하지 않은 action입니다.'));
     }
-} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+} else if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = isset($_REQUEST['action']) ? $_REQUEST['action'] : '';
 
     if ($action == 'updateCartItem') {
+        // 요청 파라미터 가져오기
         $itemId = isset($_REQUEST['itemId']) ? $_REQUEST['itemId'] : null;
         $orderId = isset($_REQUEST['orderId']) ? $_REQUEST['orderId'] : null;
         $quantity = isset($_REQUEST['quantity']) ? $_REQUEST['quantity'] : null;
-    
+
+        // 수량이 null이거나 숫자가 아니거나 1보다 작으면 예외를 발생시킴
+        if ($quantity === null || !is_numeric($quantity) || $quantity < 1) {
+            echo json_encode(array('success' => false, 'message' => '변경할 수량은 1 이상의 숫자여야 합니다.'));
+            exit;
+        }
+
+        // 아이템 ID와 수량이 유효할 경우 처리
         if ($itemId && $quantity) {
             try {
                 // 1. unitPrice를 가져오기 위해 foodName을 조회
@@ -366,24 +375,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
                 if (!$food) {
                     throw new Exception('해당 아이템을 찾을 수 없습니다.');
                 }
-    
-                $unitPrice = $food['PRICE'];
+
+                $unitPrice = $food['PRICE']; // 대소문자 일치 확인
                 $totalPrice = $quantity * $unitPrice;
-    
+                // echo json_encode(array('success' => true, 'data' => $totalPrice));
                 // 2. quantity와 totalPrice를 업데이트
                 $query = '
                     UPDATE OrderDetail
                     SET quantity = :quantity, totalPrice = :totalPrice
                     WHERE itemNo = :itemId AND id = :orderId
                 ';
-    
+
                 $stmt = $conn->prepare($query);
                 $stmt->bindParam(':quantity', $quantity, PDO::PARAM_INT);
                 $stmt->bindParam(':totalPrice', $totalPrice, PDO::PARAM_INT);
                 $stmt->bindParam(':itemId', $itemId, PDO::PARAM_INT);
                 $stmt->bindParam(':orderId', $orderId, PDO::PARAM_STR);
                 $stmt->execute();
-    
+
                 echo json_encode(array('success' => true));
             } catch (Exception $e) {
                 echo json_encode(array('success' => false, 'message' => '업데이트 중 오류 발생: ' . $e->getMessage()));
